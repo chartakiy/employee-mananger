@@ -43,8 +43,10 @@ class DataConnect:
     self.connection.commit()
     print(f"Department {department_name} has been added successfully")
   
-  def edit_department(self, department_id, department_name):
+  def edit_department(self, info):
     departments = self.view_department()
+    department_id, department_name = info
+
     if not departments:
       return
     
@@ -60,8 +62,9 @@ class DataConnect:
     except Exception as e:
       print(f"Error in edition: {e}")
   
-  def delete_department(self, department_id, department_name):
+  def delete_department(self, info):
     departments = self.view_department()
+    department_id, department_name = info
 
     if not departments:
       return
@@ -264,17 +267,131 @@ class DataConnect:
     except Exception as e:
       print(f"Error happened while deletion: {e}")
 
+def department_manager(db):
+  while True:
+    print("\n ======================= Department Manager =======================")
+    print("1. View Departments\n2. Add a department\n3. Edit a department\n4. Delete a department\n5. Go Back")
+    choice = input("enter your choice: ")
+    if choice == "1":
+      db.view_department()
+
+    elif choice == "2":
+      department_name = input("Department Name: ")
+      db.add_department(department_name)
+
+    elif choice == "3":
+      departments = db.view_department()
+
+      if departments:
+        try:
+          edit_d_id = int(input("Enter the Department ID you want to edit: "))
+          for dept in departments:
+            if dept[0] == edit_d_id:
+              db.edit_department((dept[0], dept[1]))
+              break
+            else:
+                print("No department found with that ID.")
+        except ValueError:
+          print("Please Enter a valid number")
+    
+    elif choice == "4":
+      departments = db.view_department()
+
+      if departments:
+        try:
+          del_d_id = int(input("Enter the Department ID you want to delete: "))
+          for dept in departments:
+            if dept[0] == del_d_id:
+              db.delete_department((dept[0], dept[1]))
+              break
+            else:
+                print("No department found with that ID.")
+        except ValueError:
+          print("Please Enter a valid number")
+    
+    elif choice == "5":
+      break
+    
+    else:
+      print("Invalid choice. Try again.")
+        
+
+def countries_manager(db):
+  while True:
+    print("\n ======================= Country Manager =======================")
+    print("1. View Countries\n2. Add a Country\n3. Edit a Country\n4. Delete a Country\n5. Go Back")
+    
+    choice = input("Enter your choice: ").strip()
+    
+    if choice == "1":
+      db.view_country()
+
+    elif choice == "2":
+      country_name = input("Country Name: ").strip()
+      country_type = input("Country Type: ").strip()
+      db.add_country(country_name, country_type)
+
+    elif choice == "3":
+      countries = db.view_country()
+      if countries:
+        try:
+          edit_c_id = int(input("Enter the Country ID you want to edit: "))
+          for country in countries:
+            if country[0] == edit_c_id:
+              self_query = "SELECT country_type FROM country WHERE country_id = %s"
+              db.cursor.execute(self_query, (edit_c_id,))
+              result = db.cursor.fetchone()
+              if result:
+                country_type = result[0]
+                db.edit_country(country[0], country[1], country_type)
+              else:
+                print("Country type not found for that ID.")
+              break
+          else:
+            print("No country found with that ID.")
+        except ValueError:
+          print("Please enter a valid number.")
+
+    elif choice == "4":
+      countries = db.view_country()
+      if countries:
+        try:
+          del_c_id = int(input("Enter the Country ID you want to delete: "))
+          for country in countries:
+            if country[0] == del_c_id:
+              db.delete_country(country[0], country[1])
+              break
+          else:
+            print("No country found with that ID.")
+        except ValueError:
+          print("Please enter a valid number.")
+
+    elif choice == "5":
+      break
+
+    else:
+      print("Invalid choice. Try again.")
+
+def search_mode(db):
+  pass
+
 def main():
   db = DataConnect()
 
-  # db.view_department()
-  # db.view_country()
-  # db.add_country("Greenland", "Republic")
-  # db.view_employees()
-  # db.add_department('Sport')
-
-  # db.delete_country(3, 'Germany')
-  # db.edit_country(4, 'Greenladnd', "Republic")
+  while True:
+    print("\n ======================= Main Menu ======================= ")
+    print("1. Departments\n2. Countries\n3. Employees\n4. Search mode\n5. Exit")
+    
+    choice = input("Choose an option: ")
+    if choice == "1":
+      department_manager(db)
+    elif choice == "2":
+      countries_manager(db)
+    elif choice == "5":
+      print("Exiting the program.")
+      break
+    else:
+      print("Invalid choice, try again.")
 
 
 if __name__ == "__main__":
