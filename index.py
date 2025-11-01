@@ -43,24 +43,67 @@ class DataConnect:
     self.connection.commit()
     print(f"Department {department_name} has been added successfully")
   
+  def edit_department(self, department_id, department_name):
+    departments = self.view_department()
+    if not departments:
+      return
+    
+    try:
+      new_department_name = input("New Department Name (or leave blank to keep current): ").strip()
+      if not new_department_name:
+        new_department_name = department_name
+
+      query = "UPDATE department SET department_name=%s WHERE department_id=%s"
+      self.cursor.execute(query, (new_department_name, department_id))
+      self.connection.commit()
+      print("Department updated successfully")
+    except Exception as e:
+      print(f"Error in edition: {e}")
+  
+  def delete_department(self, department_id, department_name):
+    departments = self.view_department()
+
+    if not departments:
+      return
+    
+    confirm = input(f"Are you sure you want to delete department '{department_name}' (y/n): ").lower().strip()
+    if confirm != 'y':
+        print("Deletion cancelled")
+        return
+    
+    try:
+      query = "DELETE FROM department WHERE department_id = %s"
+      self.cursor.execute(query, (department_id, ))
+      self.connection.commit()
+
+      if self.cursor.rowcount > 0:
+          print(f"Department '{department_name}' has been deleted.")
+      else:
+          print(f"No department found with ID {department_id}.")
+
+    except psycopg2.IntegrityError:
+      self.connection.rollback()
+      print("Cannot delete this department because it is referenced by employees.")
+
+    except Exception as e:
+      print(f"Error happened while deletion: {e}")
+  
   # -----------------------------------------------------------------------------
   # ------------------------- code for country table ----------------------------
   # -----------------------------------------------------------------------------
   def view_country(self):
-    query = "SELECT country_id, country_name, country_type FROM country"
+    query = "SELECT country_id, country_name FROM country ORDER BY country_id"
     self.cursor.execute(query)
     rows = self.cursor.fetchall()
 
     if not rows:
-      print("no country can be found")
+        print("No countries found.")
     else:
-      print("\n========= COUNTRIES =========")
-
-      for country_id, country_name, country_type in rows:
-        print(f"Country ID: {country_id}, Country Name: {country_name}, Country Type: {country_type}")
-
+        print("\n========= COUNTRIES =========")
+        for country_id, country_name in rows:
+            print(f"Country ID: {country_id}, Country Name: {country_name}")
     return rows
-  
+
   # -----------------------------------------------------------------------------
   # ------------------------- code for employees table --------------------------
   # -----------------------------------------------------------------------------
@@ -87,7 +130,7 @@ class DataConnect:
 def main():
   db = DataConnect()
 
-  # db.view_department()
+  db.view_department()
   # db.view_country()
   # db.view_employees()
   # db.add_department('Sport')
