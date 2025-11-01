@@ -104,6 +104,63 @@ class DataConnect:
             print(f"Country ID: {country_id}, Country Name: {country_name}")
     return rows
 
+  def add_country(self, country_name, country_type):
+    query = "INSERT INTO country(country_name, country_type) VALUES (%s, %s)"
+    self.cursor.execute(query, (country_name, country_type))
+    self.connection.commit()
+    print(f"Country {country_name} has been added successfully")
+  
+  def edit_country(self, country_id, country_name, country_type):
+    countries = self.view_country()
+    if not countries:
+      return
+    
+    try:
+      print(f"\nEditing country '{country_name}'")
+      new_country_name = input("New Country Name (or leave blank to keep current): ").strip()
+      new_country_type = input("New Country Type (or leave blank to keep current): ").strip()
+      if not new_country_name:
+        new_country_name = country_name
+
+      query = """
+        UPDATE country 
+        SET country_name = %s, country_type = %s
+        WHERE country_id = %s
+      """
+      self.cursor.execute(query, (new_country_name, new_country_type, country_id))
+      self.connection.commit()
+      print("Country updated successfully")
+    except Exception as e:
+      print(f"Error in edition: {e}")
+  
+  def delete_country(self, country_id, country_name):
+    countries = self.view_country()
+
+    if not countries:
+      return
+    
+    confirm = input(f"Are you sure you want to delete country '{country_name}' (y/n): ").lower().strip()
+    if confirm != 'y':
+        print("Deletion cancelled")
+        return
+    
+    try:
+      query = "DELETE FROM country WHERE country_id = %s"
+      self.cursor.execute(query, (country_id, ))
+      self.connection.commit()
+
+      if self.cursor.rowcount > 0:
+          print(f"Country '{country_name}' has been deleted.")
+      else:
+          print(f"No country found with ID {country_id}.")
+
+    except psycopg2.IntegrityError:
+      self.connection.rollback()
+      print("Cannot delete this country because it is referenced by employees.")
+
+    except Exception as e:
+      print(f"Error happened while deletion: {e}")
+
   # -----------------------------------------------------------------------------
   # ------------------------- code for employees table --------------------------
   # -----------------------------------------------------------------------------
@@ -130,10 +187,14 @@ class DataConnect:
 def main():
   db = DataConnect()
 
-  db.view_department()
-  # db.view_country()
+  # db.view_department()
+  db.view_country()
+  # db.add_country("Greenland", "Republic")
   # db.view_employees()
   # db.add_department('Sport')
+
+  # db.delete_country(3, 'Germany')
+  # db.edit_country(4, 'Greenladnd', "Republic")
 
 
 if __name__ == "__main__":
