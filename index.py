@@ -197,52 +197,6 @@ class DataConnect:
     self.cursor.execute(query, (employee_first_name, employee_last_name, country_id, department_id, salary, email, phone_number))
     self.connection.commit()
     print(f"Employee {employee_first_name} {employee_last_name} has been added successfully")
-  
-  # def edit_employee(self, employee_id, employee_first_name, employee_last_name, country_name, department_name, salary, email, phone_number):
-  #   employees = self.view_employees()
-  #   if not employees:
-  #     return
-    
-  #   try:
-  #     print(f"\nEditing Employee '{employee_first_name} {employee_last_name}'")
-  #     new_employee_first_name = input("New Employee First Name (or leave blank to keep current): ").strip()
-  #     if not new_employee_first_name:
-  #       new_employee_first_name = employee_first_name
-
-  #     new_employee_last_name = input("New Employee Last Name (or leave blank to keep current): ").strip()
-  #     if not new_employee_last_name:
-  #       new_employee_last_name = employee_last_name
-      
-  #     new_country_name = input("New Employee Country Name (or leave blank to keep current): ").strip()
-  #     if not new_country_name:
-  #       new_country_name = country_name
-      
-  #     new_department_name = input("New Employee Department Name (or leave blank to keep current): ").strip()
-  #     if not new_department_name:
-  #       new_department_name = department_name
-      
-  #     new_salary = input("New Employee Salary (or leave blank to keep current): ").strip()
-  #     if not new_salary:
-  #       new_salary = salary
-      
-  #     new_email = input("New Employee Email (or leave blank to keep current): ").strip()
-  #     if not new_email:
-  #       new_email = email
-      
-  #     new_phone_number = input("New Employee Phone Number (or leave blank to keep current): ").strip()
-  #     if not new_phone_number:
-  #       new_phone_number = phone_number
-
-  #     query = """
-  #       UPDATE employees 
-  #       SET employee_first_name = %s, employee_last_name = %s, country_name = %s, department_name = %s, salary = %s, email = %s, phone_number = %s
-  #       WHERE employee_id = %s 
-  #     """
-  #     self.cursor.execute(query, (new_employee_first_name, new_employee_last_name, new_country_name, new_department_name, new_salary, new_phone_number))
-  #     self.connection.commit()
-  #     print("Employee updated successfully")
-  #   except Exception as e:
-  #     print(f"Error in edition: {e}")
 
   def edit_employee(self, employee_id, first_name, last_name, country_id, department_id, salary, email, phone_number):
     employees = self.view_employees()
